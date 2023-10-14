@@ -3,7 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 
 const ResultScreen = () => {
   return(
-    <></>
+    <View>
+      <Text>結果</Text>
+    </View>
   )
 };
 
