@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   TextInput,
@@ -18,12 +18,46 @@ import {
 import type { StackParamList } from "../App";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen: React.FC = () => {
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  // ログインデータを保存する関数
+  const saveData = async (key: string, value: string) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (error) {
+      Alert.alert("エラー");
+    }
+  };
+
+  // ログインデータを取得する関数
+  const getData = async (key: string) => {
+    try {
+      const value = await AsyncStorage.getItem(key);
+      if (value !== null) {
+        return value;
+      }
+      return "";
+    } catch (error) {
+      Alert.alert("エラー");
+      return "";
+    }
+  };
+
+  useEffect(() => {
+    const initSet = async () => {
+      const initemail = await getData('email');
+      const initpassword = await getData('password');
+      setEmail(initemail);
+      setPassword(initpassword)
+    }
+    initSet();
+  }, [])
 
   const handleLogin = async () => {
     try {
@@ -37,6 +71,8 @@ const LoginScreen: React.FC = () => {
         navigation.navigate("Login");
       } else {
         if (user.emailVerified == true) {
+          saveData('email', email);
+          saveData('password', password);
           navigation.navigate("Play");
         } else {
           Alert.alert("メールの認証がされていません");
