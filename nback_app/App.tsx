@@ -4,15 +4,11 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text, View, StyleSheet } from "react-native";
 import LoginScreen from "./screens/LoginScreen";
 import PlayScreen from "./screens/PlayScreen";
-import LandingScreen from "./screens/LandingScreen";
-import ResultScreen from "./screens/ResultScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
 
 export type StackParamList = {
-  Result: undefined;
-  Landing: undefined;
   Login: undefined;
   Play: undefined;
   Register: undefined;
@@ -55,15 +51,6 @@ export default function App() {
     return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName={"Login"}>
-          <Stack.Screen
-            name="Result"
-            component={ResultScreen}
-            options={{
-              headerBackVisible: false,
-              gestureEnabled: false,
-            }}
-          />
-          <Stack.Screen name="Landing" component={LandingScreen} />
           <Stack.Screen
             name="Login"
             component={LoginScreen}

@@ -33,6 +33,11 @@ const PlayScreen: React.FC = () => {
       const updatedList = [...prevList, alphabet[randomIndex]].slice(-4);
       return updatedList;
     });
+    if (displayCount <= 3) {
+      setTimeout(() => {
+        setRandomLetter("");
+      }, 1500);
+    }
     if (displayCount >= 4) {
       setCheckBool(false);
       setCanResume(false);
@@ -54,17 +59,27 @@ const PlayScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      RandomAlphabet();
-    }, 2000);
+    if (displayCount <= 4) {
+      const intervalIdBefore = setInterval(() => {
+        RandomAlphabet();
+      }, 2000);
 
-    return () => {
-      clearInterval(intervalId);
-    };
+      return () => {
+        clearInterval(intervalIdBefore);
+      };
+    } else {
+      const intervalIdAfter = setInterval(() => {
+        RandomAlphabet();
+      }, 1500);
+
+      return () => {
+        clearInterval(intervalIdAfter);
+      };
+    }
   }, [displayCount, canResume]);
 
   useEffect(() => {
-    //最初に表示させる4個のアルファベットを除外して30問解かせるため
+    //最初に表示させる4個のアルファベットを除外して20問解かせるため
     if (displayCount === 24) {
       setEndUp(false);
     }
@@ -72,14 +87,14 @@ const PlayScreen: React.FC = () => {
 
   const formatDateToCustomString = (date: Date): string => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    const seconds = String(date.getSeconds()).padStart(2, '0');
-  
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+
     return `${year}/${month}/${day}/${hours}:${minutes}:${seconds}`;
-  }
+  };
 
   const SendData = async () => {
     const currentDate: Date = new Date();
@@ -90,7 +105,9 @@ const PlayScreen: React.FC = () => {
         解答時間: timeList,
       },
     };
-    const currentUserEmail = auth.currentUser?.email ? auth.currentUser.email : "";
+    const currentUserEmail = auth.currentUser?.email
+      ? auth.currentUser.email
+      : "";
     const dataRef = doc(db, "2023", currentUserEmail);
     await setDoc(
       dataRef,
@@ -99,7 +116,7 @@ const PlayScreen: React.FC = () => {
       },
       { merge: true }
     );
-    navigation.navigate("Result");
+    navigation.navigate("Login");
   };
 
   return (
@@ -183,3 +200,5 @@ const styles = StyleSheet.create({
 });
 
 export default PlayScreen;
+
+//seb01005@st.osakafu-u.ac.jp

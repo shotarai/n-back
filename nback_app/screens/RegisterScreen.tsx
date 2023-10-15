@@ -76,19 +76,13 @@ const RegisterScreen: React.FC = () => {
   );
 
   const registerButton = (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={handleRegister}
-    >
+    <TouchableOpacity style={styles.button} onPress={handleRegister}>
       <Text style={styles.text}>登録する</Text>
     </TouchableOpacity>
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      style={styles.container}
-    >
+    <KeyboardAvoidingView behavior="padding" style={styles.container}>
       <Text style={styles.heading}>ユーザー登録</Text>
       {inputEmail}
       {inputPassword}
@@ -98,36 +92,36 @@ const RegisterScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      justifyContent: "center",
-      padding: 16,
-    },
-    heading: {
-      fontSize: 24,
-      marginBottom: 16,
-      textAlign: "center",
-    },
-    input: {
-      height: 40,
-      borderColor: "gray",
-      borderWidth: 1,
-      marginBottom: 12,
-      paddingLeft: 10,
-    },
-    button: {
-      padding: 10,
-      marginBottom: 10,
-      backgroundColor: "#88cb7f",
-      width: 150,
-      borderRadius: 10,
-      alignSelf: "center",
-    },
-    text: {
-      color: "white",
-      fontSize: 20,
-      textAlign: "center",
-    },
-  });
+  container: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 16,
+  },
+  heading: {
+    fontSize: 24,
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 12,
+    paddingLeft: 10,
+  },
+  button: {
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: "#88cb7f",
+    width: 150,
+    borderRadius: 10,
+    alignSelf: "center",
+  },
+  text: {
+    color: "white",
+    fontSize: 20,
+    textAlign: "center",
+  },
+});
 
 export default RegisterScreen;
