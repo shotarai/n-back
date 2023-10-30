@@ -25,6 +25,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "82325fc0-37d2-483a-a3fc-f01ce8dc8031"
+      }
+    },
+    "owner": "n-back",
+    "updates": {
+      "url": "https://u.expo.dev/82325fc0-37d2-483a-a3fc-f01ce8dc8031"
+    },
+    "runtimeVersion": "exposdk:49.0.0"
   }
 }

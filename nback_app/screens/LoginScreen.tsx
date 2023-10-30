@@ -27,36 +27,43 @@ const LoginScreen: React.FC = () => {
   const [password, setPassword] = useState("");
 
   // ログインデータを保存する関数
-  const saveData = async (key: string, value: string) => {
-    try {
-      await AsyncStorage.setItem(key, value);
-    } catch (error) {
-      Alert.alert("エラー");
-    }
-  };
+  // const saveData = async (key: string, value: string) => {
+  //   try {
+  //     await AsyncStorage.setItem(key, value);
+  //   } catch (error) {
+  //     Alert.alert("エラー");
+  //   }
+  // };
 
-  // ログインデータを取得する関数
-  const getData = async (key: string) => {
-    try {
-      const value = await AsyncStorage.getItem(key);
-      if (value !== null) {
-        return value;
-      }
-      return "";
-    } catch (error) {
-      Alert.alert("エラー");
-      return "";
-    }
-  };
+  // // ログインデータを取得する関数
+  // const getData = async (key: string) => {
+  //   try {
+  //     const value = await AsyncStorage.getItem(key);
+  //     if (value !== null) {
+  //       return value;
+  //     }
+  //     return "";
+  //   } catch (error) {
+  //     Alert.alert("エラー");
+  //     return "";
+  //   }
+  // };
 
   useEffect(() => {
-    const initSet = async () => {
-      const initemail = await getData('email');
-      const initpassword = await getData('password');
-      setEmail(initemail);
-      setPassword(initpassword)
-    }
-    initSet();
+    // const initSet = async () => {
+    //   const initemail = await getData('email');
+    //   const initpassword = await getData('password');
+    //   setEmail(initemail);
+    //   setPassword(initpassword)
+    // }
+    // initSet();
+    onAuthStateChanged(auth, (user: User | null) => {
+      if (user) {
+        if (user.emailVerified == true) {
+          navigation.navigate("Play");
+        }
+      }
+    })
   }, [])
 
   const handleLogin = async () => {
@@ -71,8 +78,8 @@ const LoginScreen: React.FC = () => {
         navigation.navigate("Login");
       } else {
         if (user.emailVerified == true) {
-          saveData('email', email);
-          saveData('password', password);
+          // saveData('email', email);
+          // saveData('password', password);
           navigation.navigate("Play");
         } else {
           Alert.alert("メールの認証がされていません");

@@ -1,6 +1,13 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useState, useEffect } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import {
+  Alert,
+  Button,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { StackParamList } from "../App";
 import { db, auth } from "../firebase";
@@ -12,33 +19,34 @@ const PlayScreen: React.FC = () => {
   const [canResume, setCanResume] = useState(true);
   const [endUp, setEndUp] = useState(true);
   const [timeList, setTimeList] = useState<number[]>([]);
-  const [letterList, setLetterList] = useState<string[]>(["", "", "", ""]);
+  const [letterList, setLetterList] = useState<string[]>(["", "", ""]);
   const [randomLetter, setRandomLetter] = useState("");
   const [displayCount, setDisplayCount] = useState(0);
   const [collectCount, setCollectCount] = useState(0);
   const [startTime, setStartTime] = useState(0);
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  // const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const alphabet = "ABCD";
 
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
 
   const RandomAlphabet = () => {
-    if (!checkBool || displayCount === 24) {
+    if (!checkBool || displayCount === 23) {
       return;
     }
     const randomIndex = Math.floor(Math.random() * alphabet.length);
     setRandomLetter(alphabet[randomIndex]);
-    setDisplayCount(displayCount + 1);
     setLetterList((prevList) => {
-      const updatedList = [...prevList, alphabet[randomIndex]].slice(-4);
+      const updatedList = [...prevList, randomLetter].slice(-3);
       return updatedList;
     });
-    if (displayCount <= 3) {
+    setDisplayCount(displayCount + 1);
+    if (displayCount <= 2) {
       setTimeout(() => {
         setRandomLetter("");
       }, 1500);
     }
-    if (displayCount >= 4) {
+    if (displayCount >= 3) {
       setCheckBool(false);
       setCanResume(false);
       setStartTime(performance.now());
@@ -48,9 +56,9 @@ const PlayScreen: React.FC = () => {
   const CheckAnswer = (num: number) => {
     const endTime = performance.now();
     const timeDifference = (endTime - startTime) / 1000;
-    if (letterList[0] === letterList[3] && num) {
+    if (letterList[0] === letterList[2] && num) {
       setCollectCount(collectCount + 1);
-    } else if (letterList[0] !== letterList[3] && !num) {
+    } else if (letterList[0] !== letterList[2] && !num) {
       setCollectCount(collectCount + 1);
     }
     setCheckBool(true);
@@ -59,7 +67,7 @@ const PlayScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    if (displayCount <= 4) {
+    if (displayCount <= 3) {
       const intervalIdBefore = setInterval(() => {
         RandomAlphabet();
       }, 2000);
@@ -80,7 +88,7 @@ const PlayScreen: React.FC = () => {
 
   useEffect(() => {
     //最初に表示させる4個のアルファベットを除外して20問解かせるため
-    if (displayCount === 24) {
+    if (displayCount === 23) {
       setEndUp(false);
     }
   }, [timeList]);
@@ -101,7 +109,7 @@ const PlayScreen: React.FC = () => {
     const formattedDate = formatDateToCustomString(currentDate);
     const newData = {
       [formattedDate]: {
-        正解率: `${collectCount}/${displayCount - 4}`,
+        正解率: `${collectCount}/${displayCount - 3}`,
         解答時間: timeList,
       },
     };
@@ -119,16 +127,36 @@ const PlayScreen: React.FC = () => {
     navigation.navigate("Login");
   };
 
+  // ログアウトボタンが押されたときの処理
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+    } catch (error) {
+      Alert.alert("ログアウト中にエラーが起きました");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {endUp ? (
         startBool ? (
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => setStartBool(false)}
-          >
-            <Text style={styles.buttonText}>Start</Text>
-          </TouchableOpacity>
+          <View style={styles.container}>
+            <Text style={styles.text}>{auth.currentUser?.email}さん</Text>
+            <Text style={[styles.text, { marginBottom: 50 }]}>今日も頑張りましょう！</Text>
+            <TouchableOpacity
+              style={[styles.button, { marginBottom: 50 }]}
+              onPress={() => setStartBool(false)}
+            >
+              <Text style={styles.buttonText}>Start</Text>
+            </TouchableOpacity>
+            <Button
+              title="ログアウト→"
+              onPress={() => {
+                handleLogout();
+                navigation.navigate("Login");
+              }}
+            />
+          </View>
         ) : checkBool ? (
           <View style={styles.container}>
             <Text style={[styles.randomLetter, { marginTop: -80 }]}>
@@ -137,9 +165,7 @@ const PlayScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.container}>
-            <Text style={styles.text}>
-              三つ前のアルファベットと同じですか？
-            </Text>
+            <Text style={styles.text}>2つ前と同じですか？</Text>
             <TouchableOpacity
               style={[styles.button, { marginTop: 50 }]}
               onPress={() => CheckAnswer(1)}
@@ -158,7 +184,7 @@ const PlayScreen: React.FC = () => {
         <View style={styles.container}>
           <Text style={styles.text}>結果</Text>
           <Text style={styles.text}>
-            {collectCount}/{displayCount - 4}
+            {collectCount}/{displayCount - 3}
           </Text>
           <TouchableOpacity
             style={[styles.button, { marginTop: 50 }]}
@@ -200,5 +226,3 @@ const styles = StyleSheet.create({
 });
 
 export default PlayScreen;
-
-//seb01005@st.osakafu-u.ac.jp
