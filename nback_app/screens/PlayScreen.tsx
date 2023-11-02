@@ -25,7 +25,7 @@ const PlayScreen: React.FC = () => {
   const [collectCount, setCollectCount] = useState(0);
   const [startTime, setStartTime] = useState(0);
   // const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-  const alphabet = "ABCD";
+  const alphabet = "ABCDEFGHI";
 
   type homeScreenProp = StackNavigationProp<StackParamList>;
   const navigation = useNavigation<homeScreenProp>();
@@ -53,12 +53,10 @@ const PlayScreen: React.FC = () => {
     }
   };
 
-  const CheckAnswer = (num: number) => {
+  const CheckAnswer = (str: string) => {
     const endTime = performance.now();
     const timeDifference = (endTime - startTime) / 1000;
-    if (letterList[0] === letterList[2] && num) {
-      setCollectCount(collectCount + 1);
-    } else if (letterList[0] !== letterList[2] && !num) {
+    if (letterList[0] === str) {
       setCollectCount(collectCount + 1);
     }
     setCheckBool(true);
@@ -142,7 +140,9 @@ const PlayScreen: React.FC = () => {
         startBool ? (
           <View style={styles.container}>
             <Text style={styles.text}>{auth.currentUser?.email}さん</Text>
-            <Text style={[styles.text, { marginBottom: 50 }]}>今日も頑張りましょう！</Text>
+            <Text style={[styles.text, { marginBottom: 50 }]}>
+              今日も頑張りましょう！
+            </Text>
             <TouchableOpacity
               style={[styles.button, { marginBottom: 50 }]}
               onPress={() => setStartBool(false)}
@@ -165,19 +165,70 @@ const PlayScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.container}>
-            <Text style={styles.text}>2つ前と同じですか？</Text>
-            <TouchableOpacity
-              style={[styles.button, { marginTop: 50 }]}
-              onPress={() => CheckAnswer(1)}
-            >
-              <Text style={styles.buttonText}>同じ</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, { marginTop: 20 }]}
-              onPress={() => CheckAnswer(0)}
-            >
-              <Text style={styles.buttonText}>異なる</Text>
-            </TouchableOpacity>
+            <Text style={styles.text}>{letterList}, {collectCount}</Text>
+            <Text style={styles.text}>2つ前のアルファベットは？</Text>
+            <View style={styles.buttonContainer}>
+              <View style={styles.row}>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('A')}
+                >
+                  <Text style={styles.buttonText}>A</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('B')}
+                >
+                  <Text style={styles.buttonText}>B</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('C')}
+                >
+                  <Text style={styles.buttonText}>C</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.row}>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('D')}
+                >
+                  <Text style={styles.buttonText}>D</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('E')}
+                >
+                  <Text style={styles.buttonText}>E</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('F')}
+                >
+                  <Text style={styles.buttonText}>F</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.row}>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('G')}
+                >
+                  <Text style={styles.buttonText}>G</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('H')}
+                >
+                  <Text style={styles.buttonText}>H</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.button2}
+                  onPress={() => CheckAnswer('I')}
+                >
+                  <Text style={styles.buttonText}>I</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </View>
         )
       ) : (
@@ -209,6 +260,30 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: 150,
+  },
+  buttonContainer: {
+    flexDirection: "column",
+    flexWrap: "wrap",
+    alignItems: "center",
+    alignContent: "center",
+    width: "80%", // ボタンの幅を調整
+    height: "80%", // ボタンの高さを調整
+    margin: 10, // コンテナ全体の余白を調整
+    justifyContent: "center", // 水平方向に中央揃え
+  },
+  row: {
+    flexDirection: "row",
+    width: "100%", // 1行全体の幅を調整
+    justifyContent: "center",
+  },
+  button2: {
+    width: 100, // ボタンの幅
+    height: 60, // ボタンの高さ
+    margin: 5, // ボタン間の余白を調整
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "blue", // ボタンの背景色
+    borderRadius: 8, // ボタンの角を丸くする
   },
   buttonText: {
     color: "white",
