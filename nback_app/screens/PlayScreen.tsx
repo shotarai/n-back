@@ -1,8 +1,6 @@
 import { StackNavigationProp } from "@react-navigation/stack";
 import React, { useState, useEffect } from "react";
 import {
-  Alert,
-  Button,
   View,
   Text,
   TouchableOpacity,
@@ -14,16 +12,18 @@ import { db, auth } from "../firebase";
 import { doc, setDoc } from "firebase/firestore";
 
 const PlayScreen: React.FC = () => {
-  const [startBool, setStartBool] = useState(true);
   const [checkBool, setCheckBool] = useState(true);
   const [canResume, setCanResume] = useState(true);
   const [endUp, setEndUp] = useState(true);
   const [timeList, setTimeList] = useState<number[]>([]);
+  const [correctList, setCorrectList] = useState<number[]>([]);
   const [letterList, setLetterList] = useState<string[]>(["", "", ""]);
   const [randomLetter, setRandomLetter] = useState("");
   const [displayCount, setDisplayCount] = useState(0);
-  const [collectCount, setCollectCount] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
   const [startTime, setStartTime] = useState(0);
+  const n = 3;
+  const all_questions = 20;
   // const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const alphabet = "ABCDEFGHI";
 
@@ -31,22 +31,22 @@ const PlayScreen: React.FC = () => {
   const navigation = useNavigation<homeScreenProp>();
 
   const RandomAlphabet = () => {
-    if (!checkBool || displayCount === 23) {
+    if (!checkBool || displayCount === all_questions + n + 1) {
       return;
     }
     const randomIndex = Math.floor(Math.random() * alphabet.length);
     setRandomLetter(alphabet[randomIndex]);
     setLetterList((prevList) => {
-      const updatedList = [...prevList, randomLetter].slice(-3);
+      const updatedList = [...prevList, randomLetter].slice(-(n+1));
       return updatedList;
     });
     setDisplayCount(displayCount + 1);
-    if (displayCount <= 2) {
+    if (displayCount <= n) {
       setTimeout(() => {
         setRandomLetter("");
       }, 1500);
     }
-    if (displayCount >= 3) {
+    if (displayCount >= n + 1) {
       setCheckBool(false);
       setCanResume(false);
       setStartTime(performance.now());
@@ -57,7 +57,10 @@ const PlayScreen: React.FC = () => {
     const endTime = performance.now();
     const timeDifference = (endTime - startTime) / 1000;
     if (letterList[0] === str) {
-      setCollectCount(collectCount + 1);
+      setCorrectCount(correctCount + 1);
+      setCorrectList((prevList) => [...prevList, 1])
+    }else{
+      setCorrectList((prevList) => [...prevList, 0])
     }
     setCheckBool(true);
     setCanResume(true);
@@ -65,7 +68,7 @@ const PlayScreen: React.FC = () => {
   };
 
   useEffect(() => {
-    if (displayCount <= 3) {
+    if (displayCount <= n + 1) {
       const intervalIdBefore = setInterval(() => {
         RandomAlphabet();
       }, 2000);
@@ -86,7 +89,7 @@ const PlayScreen: React.FC = () => {
 
   useEffect(() => {
     //最初に表示させる4個のアルファベットを除外して20問解かせるため
-    if (displayCount === 23) {
+    if (displayCount === all_questions + n + 1) {
       setEndUp(false);
     }
   }, [timeList]);
@@ -107,7 +110,9 @@ const PlayScreen: React.FC = () => {
     const formattedDate = formatDateToCustomString(currentDate);
     const newData = {
       [formattedDate]: {
-        正解率: `${collectCount}/${displayCount - 3}`,
+        正解数: correctCount,
+        解答数: displayCount - n - 1,
+        正答遷移: correctList,
         解答時間: timeList,
       },
     };
@@ -125,39 +130,10 @@ const PlayScreen: React.FC = () => {
     navigation.navigate("Login");
   };
 
-  // ログアウトボタンが押されたときの処理
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-    } catch (error) {
-      Alert.alert("ログアウト中にエラーが起きました");
-    }
-  };
-
   return (
     <View style={styles.container}>
       {endUp ? (
-        startBool ? (
-          <View style={styles.container}>
-            <Text style={styles.text}>{auth.currentUser?.email}さん</Text>
-            <Text style={[styles.text, { marginBottom: 50 }]}>
-              今日も頑張りましょう！
-            </Text>
-            <TouchableOpacity
-              style={[styles.button, { marginBottom: 50 }]}
-              onPress={() => setStartBool(false)}
-            >
-              <Text style={styles.buttonText}>Start</Text>
-            </TouchableOpacity>
-            <Button
-              title="ログアウト→"
-              onPress={() => {
-                handleLogout();
-                navigation.navigate("Login");
-              }}
-            />
-          </View>
-        ) : checkBool ? (
+         checkBool ? (
           <View style={styles.container}>
             <Text style={[styles.randomLetter, { marginTop: -80 }]}>
               {randomLetter}
@@ -165,8 +141,7 @@ const PlayScreen: React.FC = () => {
           </View>
         ) : (
           <View style={styles.container}>
-            <Text style={styles.text}>{letterList}, {collectCount}</Text>
-            <Text style={styles.text}>2つ前のアルファベットは？</Text>
+            <Text style={styles.text}>{n}つ前のアルファベットは？</Text>
             <View style={styles.buttonContainer}>
               <View style={styles.row}>
                 <TouchableOpacity
@@ -235,7 +210,7 @@ const PlayScreen: React.FC = () => {
         <View style={styles.container}>
           <Text style={styles.text}>結果</Text>
           <Text style={styles.text}>
-            {collectCount}/{displayCount - 3}
+            {correctCount}/{displayCount - n - 1}
           </Text>
           <TouchableOpacity
             style={[styles.button, { marginTop: 50 }]}
@@ -264,8 +239,6 @@ const styles = StyleSheet.create({
   buttonContainer: {
     flexDirection: "column",
     flexWrap: "wrap",
-    alignItems: "center",
-    alignContent: "center",
     width: "80%", // ボタンの幅を調整
     height: "80%", // ボタンの高さを調整
     margin: 10, // コンテナ全体の余白を調整
@@ -274,12 +247,11 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: "row",
     width: "100%", // 1行全体の幅を調整
-    justifyContent: "center",
   },
   button2: {
     width: 100, // ボタンの幅
-    height: 60, // ボタンの高さ
-    margin: 5, // ボタン間の余白を調整
+    height: 100, // ボタンの高さ
+    margin: 8, // ボタン間の余白を調整
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "blue", // ボタンの背景色

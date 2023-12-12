@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { Text, View, StyleSheet } from "react-native";
 import LoginScreen from "./screens/LoginScreen";
+import StartScreen from "./screens/StartScreen";
 import PlayScreen from "./screens/PlayScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import { onAuthStateChanged } from "firebase/auth";
@@ -10,6 +11,7 @@ import { auth } from "./firebase";
 
 export type StackParamList = {
   Login: undefined;
+  Start: undefined;
   Play: undefined;
   Register: undefined;
 };
@@ -59,6 +61,14 @@ export default function App() {
               gestureEnabled: false,
             }}
           />
+          <Stack.Screen
+            name="Start"
+            component={StartScreen}
+            options={{
+              headerBackVisible: false,
+              gestureEnabled: false,
+            }}
+          />  
           <Stack.Screen
             name="Play"
             component={PlayScreen}

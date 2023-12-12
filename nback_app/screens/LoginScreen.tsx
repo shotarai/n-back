@@ -18,7 +18,6 @@ import {
 import type { StackParamList } from "../App";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const LoginScreen: React.FC = () => {
   type homeScreenProp = StackNavigationProp<StackParamList>;
@@ -60,7 +59,7 @@ const LoginScreen: React.FC = () => {
     onAuthStateChanged(auth, (user: User | null) => {
       if (user) {
         if (user.emailVerified == true) {
-          navigation.navigate("Play");
+          navigation.navigate("Start");
         }
       }
     })
@@ -80,7 +79,7 @@ const LoginScreen: React.FC = () => {
         if (user.emailVerified == true) {
           // saveData('email', email);
           // saveData('password', password);
-          navigation.navigate("Play");
+          navigation.navigate("Start");
         } else {
           Alert.alert("メールの認証がされていません");
           navigation.navigate("Login");
